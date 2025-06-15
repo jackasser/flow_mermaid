@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Flow Mermaid Editor</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+#editor { width: 100%; height: 200px; }
+#diagram { border: 1px solid #ccc; padding: 10px; margin-top: 20px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({ startOnLoad: false });
+function render() {
+  const text = document.getElementById('editor').value;
+  const el = document.getElementById('diagram');
+  el.innerHTML = `<pre class="mermaid">${text}</pre>`;
+  mermaid.init(undefined, el);
+}
+function download() {
+  const text = document.getElementById('editor').value;
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'flow.mmd';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function upload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('editor').value = e.target.result;
+    render();
+  };
+  reader.readAsText(file);
+}
+</script>
+</head>
+<body>
+<h1>Flow Mermaid Editor</h1>
+<textarea id="editor">graph TD;
+A[開始] --> B{条件};
+B -- はい --> C[処理1];
+B -- いいえ --> D[処理2];
+C --> E[終了];
+D --> E;</textarea>
+<br>
+<input type="file" accept=".mmd,.txt" onchange="upload(event)">
+<button onclick="render()">描画</button>
+<button onclick="download()">ダウンロード</button>
+<div id="diagram"></div>
+</body>
+</html>
